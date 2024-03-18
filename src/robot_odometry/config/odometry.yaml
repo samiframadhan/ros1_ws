@@ -1,0 +1,8 @@
+wheel_motor_separation: 0.0
+wheel_radius: 0.0
+publish_tf: true
+left_motor_topic: "motor/left"
+right_motor_topic: "motor/right"
+
+odom_frame_id: "odom"
+base_frame_id: "base_link"
