@@ -1,3 +1,6 @@
 <launch>
-
+    <node name="rosserial_base_controller" pkg="rosserial_python" type="serial_node.py" respawn="false" output="screen">
+        <param name="port" value="/dev/ttyUSB0"/>
+        <param name="baud" value="230400"/>
+    </node>
 </launch>
