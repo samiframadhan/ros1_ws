@@ -41,6 +41,7 @@ add_message_files(
   FILES
   motor.msg
   PID.msg
+  tune.msg
 )
 
 ## Generate added messages and services with any dependencies listed here
