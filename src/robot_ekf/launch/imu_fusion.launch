@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="file_name" default="imu_ekf.yaml"/>
+    <node pkg="robot_localization" type="ekf_localization_node" name="robot_localization">
+        <rosparam file="$(find robot_ekf)/config/$(arg file_name)" command="load"/>
+    </node>
+</launch>
