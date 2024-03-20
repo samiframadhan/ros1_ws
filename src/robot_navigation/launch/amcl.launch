@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+    <node pkg="amcl" type="amcl" name="amcl">
+        <rosparam file="$(find robot_navigation)/config/amcl_params.yaml" command="load"/>
+    </node>
+</launch>

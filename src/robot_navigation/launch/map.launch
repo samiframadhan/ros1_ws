@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="map_file" default="map.yaml"/>
+    <node pkg="map_server" type="map_server" name="map_server" args="$(find robot_navigation)/maps/$(arg map_file)"/>
+</launch>

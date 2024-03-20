@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- 1. Bringup -->
+    <!-- 2. Map -->
+    <!-- 3. TF -->
+    <!-- 4. Robot EKF -->
+</launch>
