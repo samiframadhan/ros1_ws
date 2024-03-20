@@ -9,7 +9,6 @@ project(robot_slam)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   gmapping
-  hector_slam
 )
 
 ## System dependencies are found with CMake's conventions
