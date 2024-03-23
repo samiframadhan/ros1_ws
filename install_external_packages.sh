@@ -9,3 +9,6 @@ sudo apt install -y ros-noetic-robot-localization \
     ros-noetic-navigation \
     ros-noetic-rosserial-arduino \
     ros-noetic-map-server
+
+# optional
+sudo apt install -y ros-noetic-joy

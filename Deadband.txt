@@ -1,0 +1,7 @@
+kiri:
+    forward pwm: 95
+    backward pwm: 98
+
+kanan:
+    forward pwm: 111
+    backward pwm: 96
