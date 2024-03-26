@@ -1,6 +1,6 @@
 <launch>
     <arg name="file_name" default="odometry.yaml"/>
-    <node pkg="rovit_navsys" type="new_odom" name="odom_from_arduino">
+    <node pkg="robot_odometry" type="robot_odometry_node" name="odom_from_arduino">
         <rosparam file="$(find robot_odometry)/config/$(arg file_name)" command="load"/>
     </node>
 </launch>

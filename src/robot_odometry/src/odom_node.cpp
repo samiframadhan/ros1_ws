@@ -3,43 +3,41 @@
 int main(int argc, char** argv){
     ros::init(argc, argv, "wheel_odometry");
 
-    uint error = 0;
-    double wheel_separation = 0.0;
-    double wheel_radius = 0.0;
-    std::string left_motor_topic;
-    std::string right_motor_topic;
-    error += nh_.getParam("wheel_separation", wheel_separation);
-    error += nh_.getParam("wheel_radius", wheel_radius);
-    error += nh_.getParam("publish_tf", publish_tf);
-    error += nh_.getParam("left_motor_topic", left_motor_topic);
-    error += nh_.getParam("right_motor_topic", right_motor_topic);
-    error += nh_.getParam("base_frame_id", base_frame_id_);
-    error += nh_.getParam("odom_frame_id", odom_frame_id_);
+    ros::NodeHandle nh_("/");
 
-    auto left_sub = nh_.subscribe("motor/left", 50, leftMotorCallback);
-    auto right_sub = nh_.subscribe("motor/right", 50, rightMotorCallback);
-    odom_pub = nh_.advertise<nav_msgs::Odometry>("odom", 50);
-
-    time_.init();
-    odometry_.init(time_);
-    odometry_.setWheelParams(wheel_separation, wheel_radius, wheel_radius);
-
+    odom_node odom;
     ros::spin();
 }
 
-void leftMotorCallback(const motor_msgs::motor speedData){
+odom_node::odom_node(){
+        odom_pub = nh_.advertise<nav_msgs::Odometry>("odom", 50);
+        nh_.getParam("publish_tf", publish_tf);
+        nh_.getParam("base_frame_id", base_frame_id_);
+        nh_.getParam("odom_frame_id", odom_frame_id_);
+        nh_.getParam("left_motor_topic", left_motor_topic);
+        nh_.getParam("right_motor_topic", right_motor_topic);
+        nh_.getParam("wheel_separation", wheel_separation);
+        nh_.getParam("wheel_radius", wheel_radius);
+        // nh_.subscribe("motor/left", 50, leftMotorCallback);
+        // nh_.subscribe("motor/right", 50, rightMotorCallback);
+        time_.init();
+        odometry_.init(time_);
+        odometry_.setWheelParams(wheel_separation, wheel_radius, wheel_radius);
+}
+
+void odom_node::leftMotorCallback(const motor_msgs::motor speedData){
     lefty_ = true;
     left_speed_ = speedData.speed;
     updateOdometry();
 }
 
-void rightMotorCallback(const motor_msgs::motor speedData){
+void odom_node::rightMotorCallback(const motor_msgs::motor speedData){
     righty_ = true;
     right_speed_ = speedData.speed;
     updateOdometry();
 }
 
-void updateOdometry(){
+void odom_node::updateOdometry(){
     if(lefty_ && righty_){
         odometry_.update(left_speed_, right_speed_, time_);
         lefty_ = righty_ = false;
