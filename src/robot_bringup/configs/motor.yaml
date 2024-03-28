@@ -5,3 +5,9 @@ KD: 0
 KPRight: 3.639751362712226
 KIRight: 0.014190982905750906
 KD: 0
+
+right_deadband_f: 1 #integer
+right_deadband_b: 1 #integer
+left_deadband_f: 1 #integer
+left_deadband_b: 1 #integer
+use_sigma: true
