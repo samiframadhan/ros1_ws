@@ -1,13 +1,11 @@
-KPLeft: 3.639751362712226
-KILeft: 0.014190982905750906
-KD: 0
-
-KPRight: 3.639751362712226
-KIRight: 0.014190982905750906
-KD: 0
-
+right_kp: 0.13646681133264058
+right_ki: 9.462787297003334
 right_deadband_f: 1 #integer
 right_deadband_b: 1 #integer
+
+left_kp: 0.23186837422263423
+left_ki: 8.355274110178463
 left_deadband_f: 1 #integer
 left_deadband_b: 1 #integer
 use_sigma: true
+res_bit: 8
