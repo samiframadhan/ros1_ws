@@ -38,11 +38,13 @@ private:
 
     // diff_drive_controller::SpeedLimiter speed_limit_;
     robot_odometry::Odometry odometry_;
+    ros::Subscriber sub1;
+    ros::Subscriber sub2;
 public:
-    void leftMotorCallback(const motor_msgs::motor speedData);
-    void rightMotorCallback(const motor_msgs::motor speedData);
+    void leftMotorCallback(const motor_msgs::motor &speedData);
+    void rightMotorCallback(const motor_msgs::motor &speedData);
 
     void updateOdometry();
-    odom_node();
+    odom_node(ros::NodeHandle *nh);
     ~odom_node() {}
 };
