@@ -6,7 +6,11 @@ int main(int argc, char** argv){
     ros::NodeHandle nh_("/");
 
     odom_node odom;
+    ros::Subscriber sub1 = nh_.subscribe("motor/left", 1000, &odom_node::leftMotorCallback, &odom);
+    ros::Subscriber sub2 = nh_.subscribe("motor/right", 1000, &odom_node::rightMotorCallback, &odom);
+
     ros::spin();
+    return 0;
 }
 
 odom_node::odom_node(){
