@@ -5,6 +5,6 @@
         <rosparam file="$(find robot_ekf)/config/$(arg file_name)" command="load"/>
     </node>
     <include file="$(find robot_odometry)/launch/odometry.launch">
-        <rosparam file="$(find robot_odometry)/config/odometry_notf.yaml"/>
+        <rosparam file="$(find robot_odometry)/config/odometry_notf.yaml" command="load"/>
     </include>
 </launch>
