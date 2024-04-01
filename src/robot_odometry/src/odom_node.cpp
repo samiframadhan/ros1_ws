@@ -14,19 +14,19 @@ int main(int argc, char** argv){
 }
 
 odom_node::odom_node(ros::NodeHandle *nh_){
-        odom_pub = nh_->advertise<nav_msgs::Odometry>("odom", 50);
-        nh_->getParam("publish_tf", publish_tf);
-        nh_->getParam("base_frame_id", base_frame_id_);
-        nh_->getParam("odom_frame_id", odom_frame_id_);
-        nh_->getParam("left_motor_topic", left_motor_topic);
-        nh_->getParam("right_motor_topic", right_motor_topic);
-        nh_->getParam("wheel_separation", wheel_separation);
-        nh_->getParam("wheel_radius", wheel_radius);
-        sub1 = nh_->subscribe("motor/left", 50, &odom_node::leftMotorCallback, this);
-        sub2 = nh_->subscribe("motor/right", 50, &odom_node::rightMotorCallback, this);
-        time_.init();
-        odometry_.init(time_);
-        odometry_.setWheelParams(wheel_separation, wheel_radius, wheel_radius);
+    odom_pub = nh_->advertise<nav_msgs::Odometry>("odom", 50);
+    sub1 = nh_->subscribe("motor/left", 50, &odom_node::leftMotorCallback, this);
+    sub2 = nh_->subscribe("motor/right", 50, &odom_node::rightMotorCallback, this);
+    nh_->getParam("publish_tf", publish_tf);
+    if(!nh_->getParam("base_frame_id", base_frame_id_)) base_frame_id_ = "base_footprint";
+    if(!nh_->getParam("odom_frame_id", odom_frame_id_)) odom_frame_id_ = "odom";
+    if(!nh_->getParam("left_motor_topic", left_motor_topic)) left_motor_topic = "motor/left";
+    if(!nh_->getParam("right_motor_topic", right_motor_topic)) right_motor_topic = "motor/right";
+    if(!nh_->getParam("wheel_separation", wheel_separation)) wheel_separation = 0.206;
+    if(!nh_->getParam("wheel_radius", wheel_radius)) wheel_radius = 0.065/2;
+    time_.init();
+    odometry_.init(time_);
+    odometry_.setWheelParams(wheel_separation, wheel_radius, wheel_radius);
 }
 
 void odom_node::leftMotorCallback(const motor_msgs::motor &speedData){
@@ -64,13 +64,13 @@ void odom_node::updateOdometry(){
             tf_broadcast.transform.translation.y = odometry_.getY();
             tf_broadcast.transform.translation.z = 0.0;
             tf_broadcast.transform.rotation = odom_quat;
-            tf_broadcast.header.stamp = time_;
+            tf_broadcast.header.stamp = time_.now();
 
             robot_tf_broadcaster.sendTransform(tf_broadcast);
         }
 
         nav_msgs::Odometry odom_msg;
-        odom_msg.header.stamp = time_;
+        odom_msg.header.stamp = time_.now();
         odom_msg.header.frame_id = odom_frame_id_;
         odom_msg.child_frame_id = base_frame_id_;
         odom_msg.pose.pose.position.x = odometry_.getX();
