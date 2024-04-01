@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<launch>
+    <node pkg="robot_odometry" type="robot_odometry_node" name="odom_from_arduino"/>
+</launch>
