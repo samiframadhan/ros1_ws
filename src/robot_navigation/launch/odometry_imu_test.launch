@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 <launch>
     <include file="$(find robot_bringup)/launch/bringup.launch"/>
+    <include file="$(find robot_odometry)/launch/odometry.launch">
+    <rosparam file="$(find robot_odometry)/config/odometry_notf.yaml" command="load"/>
+    </include>
     <include file="$(find robot_description)/launch/tf_trans.launch"/>
     <include file="$(find robot_ekf)/launch/imu_odom.launch"/>
     <include file="$(find robot_visualization)/launch/view_map.launch"/>
