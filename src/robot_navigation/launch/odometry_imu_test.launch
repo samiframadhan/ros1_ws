@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
 <launch>
     <include file="$(find robot_bringup)/launch/bringup.launch"/>
-    <include file="$(find robot_odometry)/launch/robot_odometry.launch"/>
+    <!-- <include file="$(find robot_odometry)/launch/robot_odometry.launch"/> -->
     <include file="$(find robot_description)/launch/tf_trans.launch"/>
+    <!-- Udah ada odom di robot ekf -->
     <include file="$(find robot_ekf)/launch/imu_odom.launch"/>
     <include file="$(find robot_visualization)/launch/view_map.launch"/>
     <!-- 5. Move Base -->
