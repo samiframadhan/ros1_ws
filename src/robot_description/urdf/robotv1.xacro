@@ -68,13 +68,13 @@
       <geometry>
         <box size="${imu_link_length} ${imu_link_width} ${imu_link_height}"/>
       </geometry>
-      <origin xyz="0 0 ${imu_link_position_height + base_link_z_offset / 2}" rpy="0 0 0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
     </visual>
   </link>
   <joint name="imu_joint" type="fixed">
     <parent link="base_link"/>
     <child link="imu_link"/>
-    <origin xyz="0 0 ${imu_link_position_height + base_link_z_offset / 2}" rpy="0 0 0"/>
+    <origin xyz="0 0 ${imu_link_position_height + base_link_z_offset / 2}" rpy="0 0 3.14"/>
   </joint>
 
   <!-- Lidar Link -->
