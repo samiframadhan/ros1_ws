@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+    <node name="joy" pkg="joy" type="joy_node"/>
+    <node name="joy_teleop" pkg="teleop_twist_joy" type="teleop_node">
+        <rosparam file="(find robot_bringup)/configs/joy.yaml" command="load"/>
+    </node>
+</launch>
