@@ -4,5 +4,7 @@
     <node pkg="robot_localization" type="ekf_localization_node" name="robot_localization">
         <rosparam file="$(find robot_ekf)/config/$(arg file_name)" command="load"/>
     </node>
-    <include file="$(find robot_odometry)/launch/robot_odometry.launch"/>
+    <include file="$(find robot_odometry)/launch/robot_odometry.launch">
+    <!-- <param name="odom_from_arduino/publish_tf" value="false"/> -->
+    </include>
 </launch>

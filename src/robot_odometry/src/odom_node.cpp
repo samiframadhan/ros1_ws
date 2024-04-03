@@ -17,7 +17,7 @@ odom_node::odom_node(ros::NodeHandle *nh_){
     odom_pub = nh_->advertise<nav_msgs::Odometry>("odom", 50);
     sub1 = nh_->subscribe("motor/left", 50, &odom_node::leftMotorCallback, this);
     sub2 = nh_->subscribe("motor/right", 50, &odom_node::rightMotorCallback, this);
-    nh_->getParam("publish_tf", publish_tf);
+    if(!nh_->getParam("publish_tf", publish_tf)) publish_tf = false;
     if(!nh_->getParam("base_frame_id", base_frame_id_)) base_frame_id_ = "base_footprint";
     if(!nh_->getParam("odom_frame_id", odom_frame_id_)) odom_frame_id_ = "odom";
     if(!nh_->getParam("left_motor_topic", left_motor_topic)) left_motor_topic = "motor/left";

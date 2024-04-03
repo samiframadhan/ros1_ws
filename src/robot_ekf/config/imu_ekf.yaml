@@ -7,7 +7,7 @@ debug: false
 # debug_out_file: /path/to/debug/file.txt
 # map_frame: UTM             # Defaults to "map" if unspecified
 odom_frame: odom           # Defaults to "odom" if unspecified
-base_link_frame: base_link # Defaults to "base_link" if unspecified
+base_link_frame: base_footprint # Defaults to "base_link" if unspecified
 world_frame: odom          # Defaults to the value of odom_frame if unspecified
 publish_tf : true
 
