@@ -4,5 +4,5 @@
         <param name="baud" value="460800"/>
         <rosparam file="$(find robot_bringup)/configs/motor.yaml"/>
     </node>
-    <include file="(find robot_visualization)/launch/view_imu.launch"/>
+    <include file="$(find robot_visualization)/launch/view_imu.launch"/>
 </launch>
