@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <launch>
     <include file="$(find robot_bringup)/launch/bringup.launch"/>
+    <include file="$(find robot_description)/launch/tf_trans.launch"/>
     <include file="$(find robot_bringup)/launch/lidar.launch"/>
     <include file="$(find robot_slam)/launch/slam.launch"/>
 </launch>
