@@ -1,8 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-    <include file="$(find robot_bringup)/launch/bringup.launch"/>
-    <include file="$(find robot_description)/launch/tf_trans.launch"/>
-    <include file="$(find robot_navigation)/launch/map.launch"/>
-    <include file="$(find robot_ekf)/launch/imu_odom.launch"/>
+    <include file="$(find robot_navigation)/launch/localization.launch"/>
+    <include file="$(find robot_navigation)/launch/move_base.launch"/>
     <!-- 5. Move Base -->
 </launch>
