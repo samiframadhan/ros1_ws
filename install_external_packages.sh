@@ -8,6 +8,7 @@ sudo apt install -y ros-noetic-robot-localization \
     ros-noetic-hector-slam \
     ros-noetic-navigation \
     ros-noetic-rosserial-arduino \
+    ros-noetic-rplidar-ros \
     ros-noetic-map-server
 
 # optional
