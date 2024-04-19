@@ -2,4 +2,5 @@ rosserial_arduino
 robot_localization
 gmapping
 hector_slam
+rplidar_ros
 ros_navigation
