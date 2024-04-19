@@ -2,4 +2,5 @@
 <launch>
     <include file="$(find robot_ekf)/launch/imu_odomv2.launch"/>
     <include file="$(find robot_slam)/launch/slam.launch"/>
+    <include file="$(find robot_visualization)/launch/view_slam.launch"/>
 </launch>
