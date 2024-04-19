@@ -21,3 +21,5 @@ roslaunch robot_navigation robot_navigation.launch
 
 By default, the configuration of the mobile robot uses the default navigation stack of ROS.
 To find out the detailed configuration, you may proceed to see the robot_navigation package README file
+
+## TODO: Verify SLAM, Localization, Navigation
