@@ -2,8 +2,8 @@
 # right_ki: 7.319864062103793
 # right_kp: 0.43899566958380115
 # right_ki: 3.405725401139086
-right_kp: 0.13264577017515367
-right_ki: 3.8195931992612757
+right_kp: 0.363957607220761
+right_ki: 9.465858230948362
 right_deadband_f: 1 #integer
 right_deadband_b: 1 #integer
 
@@ -11,8 +11,8 @@ right_deadband_b: 1 #integer
 # left_ki: 8.355274110178463
 # left_kp: 0.253083527294445
 # left_ki: 29.048778219195405
-left_kp: 0.15080410079910733
-left_ki: 3.902183781193341
+left_kp: 0.4008638658689477
+left_ki: 9.654046357101342
 left_deadband_f: 1 #integer
 left_deadband_b: 1 #integer
 use_sigma: true
