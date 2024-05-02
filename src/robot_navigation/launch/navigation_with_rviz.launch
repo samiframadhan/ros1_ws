@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <launch>
-    <arg name="use_ekf" default="true" type="bool"/>
-    <include file="$(find robot_navigation)/launch/navigation.launch"/>
+    <arg name="use_ekf" default="false"/>
+    <include file="$(find robot_navigation)/launch/navigation.launch">
         <arg name="use_ekf" value="$(arg use_ekf)"/>
+    </include>
     <include file="$(find robot_visualization)/launch/view_navigation.launch"/>
 </launch>

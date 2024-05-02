@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
 <launch>
-    <include file="$(find robot_ekf)/launch/imu_odomv2.launch"/>
+    <arg name="use_ekf" default="false"/>
+    <include file="$(find robot_ekf)/launch/imu_odomv2.launch" if="$(arg use_ekf)"/>
+    <include file="$(find robot_odometry)/launch/robot_odometry_tf.launch" unless="$(arg use_ekf)"/>
     <include file="$(find robot_slam)/launch/slam.launch"/>
 </launch>

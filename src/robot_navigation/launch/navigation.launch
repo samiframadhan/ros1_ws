@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <launch>
     <!-- Before launch, launch bringup and lidar launch first -->
-    <arg name="use_ekf" default="true" type="bool"/>
+    <arg name="use_ekf" default="false"/>
     <include file="$(find robot_navigation)/launch/localization.launch">
         <arg name="use_ekf" value="$(arg use_ekf)"/>
-    <include/>
+    </include>
     <include file="$(find robot_navigation)/launch/move_base.launch"/>
 </launch>

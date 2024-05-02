@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- Before launch, launch bringup and lidar launch first -->
+    <include file="$(find robot_visualization)/launch/view_navigation.launch"/>
+    <include file="$(find robot_description)/launch/tf_trans.launch"/>
+    <include file="$(find robot_odometry)/launch/robot_odometry.launch">
+    <!-- <param name="odom_from_arduino/publish_tf" value="false"/> -->
+    </include>
+</launch>
