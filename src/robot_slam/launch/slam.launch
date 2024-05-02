@@ -2,6 +2,6 @@
 <launch>
     <arg name="file_name" default="gmapping.yaml"/>
     <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
-        <rosparam file="$(find robot_slam)/config/$(arg file_name).yaml" command="load"/>
+        <rosparam file="$(find robot_slam)/config/$(arg file_name)" command="load"/>
     </node>
 </launch>

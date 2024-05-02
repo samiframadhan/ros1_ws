@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
 <launch>
     <include file="$(find robot_navigation)/launch/navigation.launch"/>
-    <include file="$(find robot_visualization)/launch/view_map.launch"/>
+    <include file="$(find robot_visualization)/launch/view_navigation.launch"/>
 </launch>
