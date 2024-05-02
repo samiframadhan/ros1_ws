@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
 <launch>
+    <!-- Before launch, launch bringup and lidar launch first -->
     <arg name="filename" default="mapuji3.yaml"/>
     <arg name="map_file" default="$(find robot_navigation)/maps/$(arg filename)"/>
     <include file="$(find robot_ekf)/launch/imu_odomv2.launch"/>
     <include file="$(find robot_navigation)/launch/amcl.launch"/>
-    <include file="$(find robot_bringup)/launch/lidar.launch"/>
+    <!-- <include file="$(find robot_bringup)/launch/lidar.launch"/> -->
     <node pkg="map_server" type="map_server" name="map_server" args="$(arg map_file)"/>
 </launch>
