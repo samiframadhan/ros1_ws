@@ -6,6 +6,7 @@
 #include <geometry_msgs/Vector3.h>
 #include <tf/transform_broadcaster.h>
 #include <motor_msgs/motor.h>
+#include "RollingMean.hpp"
 
 class odom_node
 {
@@ -37,6 +38,13 @@ private:
     tf::TransformBroadcaster robot_tf_broadcaster;
 
     // diff_drive_controller::SpeedLimiter speed_limit_;
+    using RollingMeanAccumulator = rcpputils::RollingMeanAccumulator<float>;
+    RollingMeanAccumulator rpm_accumulator_r_;
+    RollingMeanAccumulator rpm_accumulator_l_;
+
+    size_t r_rpm_accumulator_size_ = 10;
+    size_t l_rpm_accumulator_size_ = 10;
+
     robot_odometry::Odometry odometry_;
     ros::Subscriber sub1;
     ros::Subscriber sub2;
@@ -45,6 +53,7 @@ public:
     void rightMotorCallback(const motor_msgs::motor &speedData);
 
     void updateOdometry();
+    void resetAccumulators();
     odom_node(ros::NodeHandle *nh);
     ~odom_node() {}
 };

@@ -6,17 +6,45 @@ int main(int argc, char** argv){
     ros::NodeHandle nh_;
 
     odom_node odom(&nh_);
+    
     // ros::Subscriber sub1 = nh_.subscribe("motor/left", 1000, &odom_node::leftMotorCallback, &odom);
     // ros::Subscriber sub2 = nh_.subscribe("motor/right", 1000, &odom_node::rightMotorCallback, &odom);
+    // ros::TimerOptions timerOps;
+    // ros::Duration dur;
+    // dur.fromNSec(100);
+    // timerOps.period = dur;
+    ros::AsyncSpinner spinner(2);
+    if(spinner.canStart())
+        spinner.start();
+    // nh_.createTimer()
+    ros::Rate loopRate(10);
 
-    ros::spin();
+    while (ros::ok())
+    {
+        odom.updateOdometry();
+        loopRate.sleep();
+        // ros::spinOnce();
+    }
+    // spinner.stop();
+
     return 0;
 }
 
-odom_node::odom_node(ros::NodeHandle *nh_){
+odom_node::odom_node(ros::NodeHandle *nh_):
+    rpm_accumulator_l_(0),
+    rpm_accumulator_r_(0)
+{
+    l_rpm_accumulator_size_ = 10;
+    r_rpm_accumulator_size_ = 10;
+    resetAccumulators();
+    rpm_accumulator_l_.accumulate(0.0);
+    rpm_accumulator_r_.accumulate(0.0);
+    
+    // resetAccumulators();
     odom_pub = nh_->advertise<nav_msgs::Odometry>("odom", 50);
     sub1 = nh_->subscribe("motor/left", 50, &odom_node::leftMotorCallback, this);
     sub2 = nh_->subscribe("motor/right", 50, &odom_node::rightMotorCallback, this);
+    
     if(!nh_->getParam("publish_tf", publish_tf)) publish_tf = true;
     if(!nh_->getParam("base_frame_id", base_frame_id_)) base_frame_id_ = "base_footprint";
     if(!nh_->getParam("odom_frame_id", odom_frame_id_)) odom_frame_id_ = "odom";
@@ -27,88 +55,97 @@ odom_node::odom_node(ros::NodeHandle *nh_){
     time_.init();
     odometry_.init(time_);
     odometry_.setWheelParams(wheel_separation, wheel_radius, wheel_radius);
+    ROS_INFO("Updating... %.2f", wheel_separation);
+}
+
+void odom_node::resetAccumulators(){
+    rpm_accumulator_l_ = RollingMeanAccumulator(l_rpm_accumulator_size_);
+    rpm_accumulator_r_ = RollingMeanAccumulator(r_rpm_accumulator_size_);
 }
 
 void odom_node::leftMotorCallback(const motor_msgs::motor &speedData){
     lefty_ = true;
-    left_speed_ = speedData.speed;
-    updateOdometry();
+    rpm_accumulator_l_.accumulate(speedData.speed);
+    // left_speed_ = speedData.speed;
+    // updateOdometry();
 }
 
 void odom_node::rightMotorCallback(const motor_msgs::motor &speedData){
     righty_ = true;
-    right_speed_ = speedData.speed;
-    updateOdometry();
+    rpm_accumulator_r_.accumulate(speedData.speed);
+    // right_speed_ = speedData.speed;
+    // updateOdometry();
 }
 
 void odom_node::updateOdometry(){
-    if(lefty_ && righty_){
-        odometry_.update(left_speed_, right_speed_, time_);
-        lefty_ = righty_ = false;
+    left_speed_ = rpm_accumulator_l_.getRollingMean();
+    right_speed_ = rpm_accumulator_r_.getRollingMean();
+    // time_.now();
+    odometry_.update(lefty_ ? left_speed_ : 0,righty_ ? right_speed_ : 0, time_);
+    lefty_ = righty_ = false;
 
-        auto odom = tf::createQuaternionFromYaw(odometry_.getHeading());
-        odom_quat.w = odom.getW();
-        odom_quat.x = odom.getX();
-        odom_quat.y = odom.getY();
-        odom_quat.z = odom.getZ();
-        auto empty = tf::createQuaternionFromYaw(0);
-        empty_quat.w = empty.getW();
-        empty_quat.x = empty.getX();
-        empty_quat.y = empty.getY();
-        empty_quat.z = empty.getZ();
-        
-        if(publish_tf){
-            tf_broadcast.header.frame_id = odom_frame_id_;
-            tf_broadcast.child_frame_id = base_frame_id_;
-            tf_broadcast.transform.translation.x = odometry_.getX();
-            tf_broadcast.transform.translation.y = odometry_.getY();
-            tf_broadcast.transform.translation.z = 0.0;
-            tf_broadcast.transform.rotation = odom_quat;
-            tf_broadcast.header.stamp = time_.now();
+    auto odom = tf::createQuaternionFromYaw(odometry_.getHeading());
+    odom_quat.w = odom.getW();
+    odom_quat.x = odom.getX();
+    odom_quat.y = odom.getY();
+    odom_quat.z = odom.getZ();
+    auto empty = tf::createQuaternionFromYaw(0);
+    empty_quat.w = empty.getW();
+    empty_quat.x = empty.getX();
+    empty_quat.y = empty.getY();
+    empty_quat.z = empty.getZ();
+    
+    if(publish_tf){
+        tf_broadcast.header.frame_id = odom_frame_id_;
+        tf_broadcast.child_frame_id = base_frame_id_;
+        tf_broadcast.transform.translation.x = odometry_.getX();
+        tf_broadcast.transform.translation.y = odometry_.getY();
+        tf_broadcast.transform.translation.z = 0.0;
+        tf_broadcast.transform.rotation = odom_quat;
+        tf_broadcast.header.stamp = time_.now();
 
-            robot_tf_broadcaster.sendTransform(tf_broadcast);
-        }
-
-        nav_msgs::Odometry odom_msg;
-        odom_msg.header.stamp = time_.now();
-        odom_msg.header.frame_id = odom_frame_id_;
-        odom_msg.child_frame_id = base_frame_id_;
-        odom_msg.pose.pose.position.x = odometry_.getX();
-        odom_msg.pose.pose.position.y = odometry_.getY();
-        odom_msg.pose.pose.position.z = 0.0;
-        odom_msg.pose.pose.orientation = odom_quat;
-        if (left_speed_ == 0 && right_speed_ == 0){
-            odom_msg.pose.covariance[0] = 1e-9;  //x pos variance
-            odom_msg.pose.covariance[7] = 1e-3;  // y Variance
-            odom_msg.pose.covariance[14] = 1e6;  // z Variance
-            odom_msg.pose.covariance[21] = 1e6;  // xrotation Variance
-            odom_msg.pose.covariance[28] = 1e6;  // yrotation Variance
-            odom_msg.pose.covariance[35] = 1e-9; // zrotation Variance
-            odom_msg.twist.covariance[0] = 1e-9; // x Variance
-            odom_msg.twist.covariance[7] = 1e-3; // y Variance
-            odom_msg.twist.covariance[14] = 1e6; // z Variance
-            odom_msg.twist.covariance[21] = 1e6; // xrotation Variance
-            odom_msg.twist.covariance[28] = 1e6; // yrotation Variance
-            odom_msg.twist.covariance[35] = 1e-9;// zrotation Variance
-        }
-        else{
-            odom_msg.pose.covariance[0] = 1e-3;
-            odom_msg.pose.covariance[7] = 1e-3;
-            odom_msg.pose.covariance[14] = 1e6;
-            odom_msg.pose.covariance[21] = 1e6;
-            odom_msg.pose.covariance[28] = 1e6;
-            odom_msg.pose.covariance[35] = zyaw_covariance;
-            odom_msg.twist.covariance[0] = 1e-3;
-            odom_msg.twist.covariance[7] = 1e-3;
-            odom_msg.twist.covariance[14] = 1e6;
-            odom_msg.twist.covariance[21] = 1e6;
-            odom_msg.twist.covariance[28] = 1e6;
-            odom_msg.twist.covariance[35] = zyaw_covariance;
-        }
-        odom_msg.twist.twist.linear.x = odometry_.getLinear();
-        odom_msg.twist.twist.linear.y = 0;
-        odom_msg.twist.twist.angular.z = odometry_.getAngular();
-
-        odom_pub.publish(odom_msg);
+        robot_tf_broadcaster.sendTransform(tf_broadcast);
     }
+
+    nav_msgs::Odometry odom_msg;
+    odom_msg.header.stamp = time_.now();
+    odom_msg.header.frame_id = odom_frame_id_;
+    odom_msg.child_frame_id = base_frame_id_;
+    odom_msg.pose.pose.position.x = odometry_.getX();
+    odom_msg.pose.pose.position.y = odometry_.getY();
+    odom_msg.pose.pose.position.z = 0.0;
+    odom_msg.pose.pose.orientation = odom_quat;
+    if (left_speed_ == 0 && right_speed_ == 0){
+        odom_msg.pose.covariance[0] = 1e-9;  //x pos variance
+        odom_msg.pose.covariance[7] = 1e-3;  // y Variance
+        odom_msg.pose.covariance[14] = 1e6;  // z Variance
+        odom_msg.pose.covariance[21] = 1e6;  // xrotation Variance
+        odom_msg.pose.covariance[28] = 1e6;  // yrotation Variance
+        odom_msg.pose.covariance[35] = 1e-9; // zrotation Variance
+        odom_msg.twist.covariance[0] = 1e-9; // x Variance
+        odom_msg.twist.covariance[7] = 1e-3; // y Variance
+        odom_msg.twist.covariance[14] = 1e6; // z Variance
+        odom_msg.twist.covariance[21] = 1e6; // xrotation Variance
+        odom_msg.twist.covariance[28] = 1e6; // yrotation Variance
+        odom_msg.twist.covariance[35] = 1e-9;// zrotation Variance
+    }
+    else{
+        odom_msg.pose.covariance[0] = 1e-3;
+        odom_msg.pose.covariance[7] = 1e-3;
+        odom_msg.pose.covariance[14] = 1e6;
+        odom_msg.pose.covariance[21] = 1e6;
+        odom_msg.pose.covariance[28] = 1e6;
+        odom_msg.pose.covariance[35] = zyaw_covariance;
+        odom_msg.twist.covariance[0] = 1e-3;
+        odom_msg.twist.covariance[7] = 1e-3;
+        odom_msg.twist.covariance[14] = 1e6;
+        odom_msg.twist.covariance[21] = 1e6;
+        odom_msg.twist.covariance[28] = 1e6;
+        odom_msg.twist.covariance[35] = zyaw_covariance;
+    }
+    odom_msg.twist.twist.linear.x = odometry_.getLinear();
+    odom_msg.twist.twist.linear.y = 0;
+    odom_msg.twist.twist.angular.z = odometry_.getAngular();
+
+    odom_pub.publish(odom_msg);
 }
