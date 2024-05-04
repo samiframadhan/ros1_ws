@@ -5,34 +5,49 @@ int main(int argc, char** argv){
 
     ros::NodeHandle nh_;
 
-    odom_node odom(&nh_);
+    ros::NodeHandle nh_private("~");
+
+    bool publish_tf = true;
+    std::string base_frame_id_;
+    std::string odom_frame_id_;
+    std::string left_motor_topic;
+    std::string right_motor_topic;
+    float wheel_separation;
+    float wheel_radius;
+    nh_private.param("publish_tf", publish_tf, true);
+    nh_private.param<std::string>("base_frame_id", base_frame_id_ , "base_footprint");
+    nh_private.param<std::string>("odom_frame_id", odom_frame_id_ , "odom");
+    nh_private.param<std::string>("left_motor_topic", left_motor_topic , "motor/left");
+    nh_private.param<std::string>("right_motor_topic", right_motor_topic , "motor/right");
+    nh_private.param<float>("wheel_separation", wheel_separation , 0.206);
+    nh_private.param<float>("wheel_radius", wheel_radius , 0.065/2);
     
-    // ros::Subscriber sub1 = nh_.subscribe("motor/left", 1000, &odom_node::leftMotorCallback, &odom);
-    // ros::Subscriber sub2 = nh_.subscribe("motor/right", 1000, &odom_node::rightMotorCallback, &odom);
-    // ros::TimerOptions timerOps;
-    // ros::Duration dur;
-    // dur.fromNSec(100);
-    // timerOps.period = dur;
+    odom_node odom(&nh_, publish_tf, odom_frame_id_, base_frame_id_, left_motor_topic, right_motor_topic, wheel_separation, wheel_radius);
+
     ros::AsyncSpinner spinner(2);
     if(spinner.canStart())
         spinner.start();
-    // nh_.createTimer()
     ros::Rate loopRate(10);
 
     while (ros::ok())
     {
         odom.updateOdometry();
         loopRate.sleep();
-        // ros::spinOnce();
     }
-    // spinner.stop();
 
     return 0;
 }
 
-odom_node::odom_node(ros::NodeHandle *nh_):
+odom_node::odom_node(ros::NodeHandle *nh_,bool pub_tf ,std::string odom_ , std::string base_ , std::string left_motor, std::string right_motor, float wheel_sep, float wheel_rad):
     rpm_accumulator_l_(0),
-    rpm_accumulator_r_(0)
+    rpm_accumulator_r_(0),
+    publish_tf(pub_tf),
+    odom_frame_id_(odom_),
+    base_frame_id_(base_),
+    left_motor_topic(left_motor),
+    right_motor_topic(right_motor),
+    wheel_separation(wheel_sep),
+    wheel_radius(wheel_rad)
 {
     l_rpm_accumulator_size_ = 10;
     r_rpm_accumulator_size_ = 10;
@@ -45,17 +60,11 @@ odom_node::odom_node(ros::NodeHandle *nh_):
     sub1 = nh_->subscribe("motor/left", 50, &odom_node::leftMotorCallback, this);
     sub2 = nh_->subscribe("motor/right", 50, &odom_node::rightMotorCallback, this);
     
-    if(!nh_->getParam("publish_tf", publish_tf)) publish_tf = true;
-    if(!nh_->getParam("base_frame_id", base_frame_id_)) base_frame_id_ = "base_footprint";
-    if(!nh_->getParam("odom_frame_id", odom_frame_id_)) odom_frame_id_ = "odom";
-    if(!nh_->getParam("left_motor_topic", left_motor_topic)) left_motor_topic = "motor/left";
-    if(!nh_->getParam("right_motor_topic", right_motor_topic)) right_motor_topic = "motor/right";
-    if(!nh_->getParam("wheel_separation", wheel_separation)) wheel_separation = 0.206;
-    if(!nh_->getParam("wheel_radius", wheel_radius)) wheel_radius = 0.065/2;
+    
     time_.init();
     odometry_.init(time_);
     odometry_.setWheelParams(wheel_separation, wheel_radius, wheel_radius);
-    ROS_INFO("Updating... %.2f", wheel_separation);
+    ROS_INFO("Updating... %d", publish_tf);
 }
 
 void odom_node::resetAccumulators(){

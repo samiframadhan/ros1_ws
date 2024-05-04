@@ -54,6 +54,6 @@ public:
 
     void updateOdometry();
     void resetAccumulators();
-    odom_node(ros::NodeHandle *nh);
+    odom_node(ros::NodeHandle *nh, bool pub_tf ,std::string odom_ , std::string base_ , std::string left_motor, std::string right_motor, float wheel_sep, float wheel_rad);
     ~odom_node() {}
 };
